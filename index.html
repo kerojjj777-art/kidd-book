@@ -6,9 +6,17 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+
+<title>KIDD ZONE - Salon CRM</title>
+<meta name="application-name" content="KIDD ZONE">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#34495E">
-<title>Kidd's Note Book - Salon CRM</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KIDD ZONE">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+
 <style>
   /* 色系變數 */
   :root {
@@ -96,13 +104,12 @@
 
   /* --- 主系統容器 --- */
   #app-screen {
-    display: none; /* 預設隱藏，登入後顯示 */
+    display: none;
     width: 100%;
     height: 100%;
     flex-direction: row;
   }
 
-  /* 側邊欄與按鈕區 (桌機預設) */
   .sidebar {
     width: 280px;
     background-color: var(--sidebar-color);
@@ -117,7 +124,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-x: hidden; /* 防止內容水平溢出 */
+    overflow-x: hidden;
   }
   
   .mobile-btn-grid {
@@ -126,7 +133,6 @@
     gap: 15px;
   }
 
-  /* 經典髮廊旋轉燈動畫 */
   .barber-pole {
     width: 100%;
     height: 20px;
@@ -196,19 +202,19 @@
     font-family: 'Courier New', Courier, monospace;
   }
 
-  /* === 全新優化：稜角臉型、微笑吐舌的柯基犬 === */
+  /* 柯基動畫相關樣式保留 */
   .corgi-container {
     margin-top: auto; 
     position: relative;
     width: 100%;
-    height: 120px; /* 優化：增加高度以容納對話氣泡 */
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
     padding-bottom: 5px;
     user-select: none;
     -webkit-user-drag: none;
-    overflow: hidden; /* 防止柯基跑出版面 */
+    overflow: hidden;
   }
   .corgi-wrapper {
     position: relative;
@@ -331,7 +337,6 @@
   .corgi-leg.front { left: 18px; }
   .corgi-leg.back { right: 22px; }
 
-  /* 睡眠狀態自然趴姿 */
   .corgi-wrapper.sleep .corgi-body { height: 20px; width: 60px; bottom: 0; left: 8px; }
   .corgi-wrapper.sleep .corgi-head { top: 30px; left: -2px; transform: rotate(-25deg); }
   .corgi-wrapper.sleep .corgi-eye { height: 2px; border-radius: 0; top: 16px; background: #666; }
@@ -355,7 +360,6 @@
     100% { transform: translate(-10px, -25px) scale(1.3); opacity: 0; }
   }
 
-  /* 單擊與雙擊動畫 */
   .corgi-wrapper.bark { animation: barkAnim 0.4s ease; }
   @keyframes barkAnim {
     0%, 100% { transform: translateY(0); }
@@ -378,7 +382,7 @@
 
   .corgi-speech-bubble {
     position: absolute;
-    bottom: 75px; /* 優化：改用 bottom 定位，確保在容器內不被遮擋 */
+    bottom: 75px;
     left: 50%;
     transform: translateX(-50%) scale(0);
     background: white;
@@ -559,15 +563,14 @@
 
     .mobile-btn-grid { display: grid; gap: 8px; }
     .grid-top { grid-template-columns: 1fr 1fr; margin-top: 10px; }
-    /* 調整底部按鈕排版，因為移除了匯出匯入 */
     .grid-bottom { grid-template-columns: 1fr; }
     
     .btn { padding: 10px 5px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
     .divider { margin: 10px 0; }
     .customer-grid { grid-template-columns: 1fr; } 
     
-    .corgi-container { height: 100px; padding-bottom: 0; overflow: hidden; } /* 優化：增加手機版高度 */
-    .corgi-speech-bubble { bottom: 65px; } /* 優化：手機版氣泡適配 */
+    .corgi-container { height: 100px; padding-bottom: 0; overflow: hidden; }
+    .corgi-speech-bubble { bottom: 65px; }
     .corgi-wrapper { transform: scale(0.85); transform-origin: bottom center; }
     
     .view-header { flex-direction: column; align-items: stretch; gap: 10px; padding: 20px; }
@@ -649,7 +652,7 @@
     <div class="main-content">
       <div class="logo-container">
         <div class="glow-logo">Kidd's Note Book</div>
-        <div class="subtitle">Salon CRM System <span style="font-size: 0.75rem; color: #999; font-family: sans-serif; letter-spacing: 1px; font-weight: normal;">(v.1.3 Cloud PWA)</span></div>
+        <div class="subtitle">Salon CRM System <span style="font-size: 0.75rem; color: #999; font-family: sans-serif; letter-spacing: 1px; font-weight: normal;">(v.1.4 Real-time Sync)</span></div>
       </div>
       
       <div class="view-scroll-area">
@@ -694,7 +697,8 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+// 替換掉 getDoc，改為匯入 onSnapshot
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBd2cHntbHp-vecIw_aIvU-sjTnSQbXvag",
@@ -786,14 +790,20 @@ const app = {
   currentView: '',
   activeCustomerId: null,
   currentUploadedImages: [],
+  unsubscribeSnapshot: null, // 用於儲存 Firestore 監聽器的取消函數
+  currentRecycleTab: 'customers', // 紀錄回收桶目前的 Tab
 
   init() {
+    console.info("System Initializing...");
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.info("User logged in:", user.uid);
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'flex';
-        this.loadCloudData(user.uid);
+        // 改為呼叫即時監聽函式
+        this.initRealtimeListener(user.uid);
       } else {
+        console.info("User logged out or not authenticated.");
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-screen').style.display = 'none';
       }
@@ -814,43 +824,94 @@ const app = {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.error(error);
+      console.error("Login failed:", error);
       errorDiv.innerText = '登入失敗，請確認帳號密碼是否正確。';
     }
   },
 
   async logout() {
     if(confirm("確定要登出系統嗎？")) {
-      await signOut(auth);
+      try {
+        // 登出時解除即時監聽
+        if (this.unsubscribeSnapshot) {
+          this.unsubscribeSnapshot();
+          this.unsubscribeSnapshot = null;
+        }
+        this.currentView = '';
+        await signOut(auth);
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
     }
   },
 
-  async loadCloudData(uid) {
-    try {
-      const docRef = doc(db, "users", uid);
-      const docSnap = await getDoc(docRef);
+  // 實作 Firebase Real-time Listener 取代原有的 loadCloudData
+  initRealtimeListener(uid) {
+    const docRef = doc(db, "users", uid);
 
+    // 如果已經有監聽器，先解除綁定 (預防重複觸發)
+    if (this.unsubscribeSnapshot) {
+      this.unsubscribeSnapshot();
+    }
+
+    console.info("Initializing Real-time listener...");
+    
+    this.unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         this.data = docSnap.data();
         if (!this.data.recycleBin) this.data.recycleBin = { customers: [], records: [] };
+        console.info("Data synced from cloud (real-time).");
+        
+        // 資料一進來，判斷是否需要重新渲染當前畫面
+        if (!this.currentView) {
+          // 初次登入載入預設畫面
+          this.navigate('customer-records');
+        } else {
+          // 即時更新目前的清單畫面
+          this.refreshCurrentView();
+        }
       } else {
+        console.info("No existing data found, initializing default structure.");
         this.data = { customers: [], records: [], recycleBin: { customers: [], records: [] } };
-        await setDoc(docRef, this.data);
+        // 若為全新帳號，寫入預設結構
+        setDoc(docRef, this.data).catch(err => console.error("Initialize doc failed", err));
+        
+        if (!this.currentView) {
+          this.navigate('customer-records');
+        }
       }
-      this.navigate('customer-records');
-    } catch (error) {
-      console.error("讀取雲端資料失敗", error);
-      alert("讀取雲端資料失敗，請檢查網路連線或資料庫權限設定。");
+    }, (error) => {
+      console.error("即時監聽失敗:", error);
+      alert("雲端資料同步失敗，請檢查網路連線或權限設定。");
+    });
+  },
+
+  // 輔助函式：根據當前畫面進行無痛刷新 (避免打斷使用者打字)
+  refreshCurrentView() {
+    if (!this.currentView) return;
+    
+    if (this.currentView === 'customer-records') {
+      this.filterCustomers();
+    } else if (this.currentView === 'view-records' && this.activeCustomerId) {
+      this.renderTimeline(this.activeCustomerId);
+    } else if (this.currentView === 'recycle-bin') {
+      this.renderRecycleBin(this.getContainer(), this.currentRecycleTab);
     }
+    // 注意：如果是 'add-customer' 或 'edit-customer' 就不主動刷新，以免清空使用者輸入一半的資料
   },
 
   async saveCloudData() {
     const user = auth.currentUser;
-    if (!user) return alert("請先登入！");
+    if (!user) {
+      alert("請先登入！");
+      return;
+    }
 
     try {
       const docRef = doc(db, "users", user.uid);
       await setDoc(docRef, this.data);
+      console.info("Data saved to cloud successfully.");
+      // 備註：成功儲存後，Firebase 會自動觸發 onSnapshot，更新其他裝置
     } catch (error) {
       console.error("儲存失敗", error);
       alert("儲存至雲端失敗！如果您上傳了太多照片，可能超過了單筆文件大小上限。");
@@ -1046,14 +1107,14 @@ const app = {
         
       const galleryHTML = hasImages
         ? `<div id="gallery_${r.id}" class="image-gallery hidden">
-             ${r.images.map((imgSrc, idx) => `<img src="${imgSrc}" onclick="app.viewFullImage('${r.id}', ${idx})">`).join('')}
+             ${r.images.map((imgSrc, idx) => `<img src="${this.escapeHTML(imgSrc)}" onclick="app.viewFullImage('${r.id}', ${idx})">`).join('')}
            </div>`
         : '';
 
       return `
         <div class="timeline-item">
           <div class="timeline-meta">
-            <strong>服務日期：${r.service_date}</strong>
+            <strong>服務日期：${this.escapeHTML(r.service_date)}</strong>
             <span>建立於：${new Date(r.system_time).toLocaleString('zh-TW')}</span>
           </div>
           <div class="timeline-content">${this.escapeHTML(r.note)}</div>
@@ -1167,7 +1228,7 @@ const app = {
     const container = document.getElementById('imagePreviewContainer');
     container.innerHTML = this.currentUploadedImages.map((src, index) => `
       <div style="position:relative; width:80px; height:80px;">
-        <img src="${src}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+        <img src="${this.escapeHTML(src)}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
         <button type="button" style="position:absolute; top:-6px; right:-6px; background:#D32F2F; color:white; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; font-weight:bold; line-height:1; box-shadow:0 2px 4px rgba(0,0,0,0.3);" onclick="app.removePreviewImage(${index})">✕</button>
       </div>
     `).join('');
@@ -1209,8 +1270,10 @@ const app = {
     try {
       await this.saveCloudData();
       this.closeModal();
+      // 在 onSnapshot 機制下，畫面其實會自己重繪，不過保守起見仍呼叫一次
       this.renderTimeline(this.activeCustomerId);
     } catch (e) {
+      console.error("Save record error, rolling back.", e);
       this.data = JSON.parse(backupData);
     }
   },
@@ -1228,6 +1291,7 @@ const app = {
   },
 
   renderRecycleBin(container, tab = 'customers') {
+    this.currentRecycleTab = tab; // 紀錄目前的分頁，讓即時更新不會跑版
     container.innerHTML = `
       <div class="view-header">
         <h2 style="margin:0 0 20px 0; color:var(--sidebar-color);">歷史回收桶</h2>
@@ -1264,7 +1328,7 @@ const app = {
         content.innerHTML = this.data.recycleBin.records.map(r => `
           <div style="padding:15px; border:1px solid #ddd; margin-bottom:15px; border-radius:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:15px;">
             <div style="flex:1; word-break:break-word;">
-               <strong>日期: ${r.service_date}</strong><br>
+               <strong>日期: ${this.escapeHTML(r.service_date)}</strong><br>
                <div style="color:#666; font-size:14px; margin-top:6px;">${this.escapeHTML(r.note).substring(0, 50)}...</div>
                ${r.images && r.images.length > 0 ? `<div style="color:#0277BD; font-size:12px; margin-top:4px;">(包含 ${r.images.length} 張照片)</div>` : ''}
             </div>
@@ -1320,9 +1384,10 @@ const app = {
     }
   },
 
+  // 系統安全性：跳脫字元防範 XSS
   escapeHTML(str) {
     if(!str) return '';
-    return str.replace(/[&<>'"]/g, 
+    return String(str).replace(/[&<>'"]/g, 
       tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
   }
@@ -1332,10 +1397,38 @@ window.app = app;
 window.corgiInteraction = corgiInteraction;
 window.onload = () => app.init();
 
-// --- Service Worker 註冊與自動更新機制 ---
+// ==========================================
+// Service Worker 註冊與強制更新機制 (Cache-busting)
+// ==========================================
+const APP_VERSION = '1.4.0'; // ⭐ 未來若需要破壞快取，請更改此變數的值
+
+// 1. 本地版號檢查：如果不同，清空快取再重新整理
+const localVersion = localStorage.getItem('app_version');
+if (localVersion !== APP_VERSION) {
+  console.info(`Updating app from version ${localVersion} to ${APP_VERSION}`);
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      for (let name of names) caches.delete(name);
+    });
+  }
+  localStorage.setItem('app_version', APP_VERSION);
+  // 若原本有舊版本，強制重整抓最新檔案
+  if (localVersion) {
+    window.location.reload();
+  }
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(registration => {
+    // 2. 加上時間戳，迫使 PWA 安裝檔每次都檢查最新狀態
+    const swUrl = `./sw.js?v=${new Date().getTime()}`;
+    
+    navigator.serviceWorker.register(swUrl).then(registration => {
+      console.info("Service Worker registered successfully.");
+      
+      // 3. 每次載入都主動要求 SW 檢查是否伺服器端有更新
+      registration.update();
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) return;
@@ -1343,14 +1436,24 @@ if ('serviceWorker' in navigator) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              alert('系統已更新至最新版本，即將為您重新載入！');
-              window.location.reload();
+              // 4. 偵測到新版本時，提示並徹底清除 Cache 後重載
+              if (confirm('系統已發布最新版本！為確保資料及功能同步，請點擊「確定」重新載入。')) {
+                 if ('caches' in window) {
+                    caches.keys().then(names => {
+                       Promise.all(names.map(name => caches.delete(name))).then(() => {
+                           window.location.reload();
+                       });
+                    });
+                 } else {
+                    window.location.reload();
+                 }
+              }
             }
           }
         };
       };
     }).catch(error => {
-      console.log('Service Worker 註冊失敗:', error);
+      console.error('Service Worker 註冊失敗:', error);
     });
   });
 }
