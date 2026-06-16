@@ -1420,8 +1420,8 @@ if (localVersion !== APP_VERSION) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // 2. 加上時間戳，迫使 PWA 安裝檔每次都檢查最新狀態
-    const swUrl = `./sw.js?v=${new Date().getTime()}`;
+    // 直接使用正確的路徑即可
+    const swUrl = `./sw.js`;
     
     navigator.serviceWorker.register(swUrl).then(registration => {
       console.info("Service Worker registered successfully.");
