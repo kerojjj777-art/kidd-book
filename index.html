@@ -2,7 +2,12 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#34495E">
 <title>Kidd's Note Book - Salon CRM</title>
 <style>
   /* 色系變數 */
@@ -112,6 +117,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow-x: hidden; /* 防止內容水平溢出 */
   }
   
   .mobile-btn-grid {
@@ -202,6 +208,7 @@
     padding-bottom: 5px;
     user-select: none;
     -webkit-user-drag: none;
+    overflow: hidden; /* 防止柯基跑出版面 */
   }
   .corgi-wrapper {
     position: relative;
@@ -543,7 +550,7 @@
 
     .sidebar-content {
       transition: max-height 0.4s ease, opacity 0.3s ease;
-      max-height: 800px; opacity: 1; overflow: hidden; margin-top: 10px;
+      max-height: 800px; opacity: 1; overflow-x: hidden; margin-top: 10px;
     }
     .sidebar-content.collapsed { max-height: 0; opacity: 0; margin-top: 0; }
 
@@ -552,12 +559,13 @@
 
     .mobile-btn-grid { display: grid; gap: 8px; }
     .grid-top { grid-template-columns: 1fr 1fr; margin-top: 10px; }
-    .grid-bottom { grid-template-columns: 1fr 1fr 1fr; }
+    /* 調整底部按鈕排版，因為移除了匯出匯入 */
+    .grid-bottom { grid-template-columns: 1fr; }
     
     .btn { padding: 10px 5px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
     .divider { margin: 10px 0; }
     .customer-grid { grid-template-columns: 1fr; } 
-    .corgi-container { height: 70px; padding-bottom: 0; }
+    .corgi-container { height: 70px; padding-bottom: 0; overflow: hidden; }
     .corgi-wrapper { transform: scale(0.85); transform-origin: bottom center; }
     
     .view-header { flex-direction: column; align-items: stretch; gap: 10px; padding: 20px; }
@@ -604,9 +612,6 @@
         <div class="divider"></div>
         
         <div class="mobile-btn-grid grid-bottom">
-          <button class="btn" onclick="app.exportData()">💾 備份匯出</button>
-          <button class="btn" onclick="document.getElementById('importFile').click()">📂 還原匯入</button>
-          <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(event)">
           <button class="btn" onclick="app.navigate('recycle-bin')">🗑️ 歷史回收</button>
         </div>
 
@@ -642,7 +647,7 @@
     <div class="main-content">
       <div class="logo-container">
         <div class="glow-logo">Kidd's Note Book</div>
-        <div class="subtitle">Salon CRM System <span style="font-size: 0.75rem; color: #999; font-family: sans-serif; letter-spacing: 1px; font-weight: normal;">(v.1.2 Cloud)</span></div>
+        <div class="subtitle">Salon CRM System <span style="font-size: 0.75rem; color: #999; font-family: sans-serif; letter-spacing: 1px; font-weight: normal;">(v.1.3 Cloud PWA)</span></div>
       </div>
       
       <div class="view-scroll-area">
@@ -685,12 +690,10 @@
   </div>
 
 <script type="module">
-// 匯入 Firebase 模組
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-// Firebase 初始設定 (使用您提供的金鑰)
 const firebaseConfig = {
   apiKey: "AIzaSyBd2cHntbHp-vecIw_aIvU-sjTnSQbXvag",
   authDomain: "kidd-salon-crm.firebaseapp.com",
@@ -705,7 +708,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 
-// === 柯基犬互動邏輯 (保持不變) ===
 const corgiInteraction = {
   timer: null,
   clickTimeout: null,
@@ -773,7 +775,6 @@ const corgiInteraction = {
   }
 };
 
-// === CRM 核心邏輯 (雲端改寫版) ===
 const app = {
   data: {
     customers: [],
@@ -785,22 +786,18 @@ const app = {
   currentUploadedImages: [],
 
   init() {
-    // 監聽 Firebase 登入狀態
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // 已登入
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'flex';
         this.loadCloudData(user.uid);
       } else {
-        // 未登入
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-screen').style.display = 'none';
       }
     });
   },
 
-  // === 登入與登出邏輯 ===
   async login() {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -826,7 +823,6 @@ const app = {
     }
   },
 
-  // === 雲端資料庫讀寫 ===
   async loadCloudData(uid) {
     try {
       const docRef = doc(db, "users", uid);
@@ -836,7 +832,6 @@ const app = {
         this.data = docSnap.data();
         if (!this.data.recycleBin) this.data.recycleBin = { customers: [], records: [] };
       } else {
-        // 新使用者的初始空資料
         this.data = { customers: [], records: [], recycleBin: { customers: [], records: [] } };
         await setDoc(docRef, this.data);
       }
@@ -857,7 +852,7 @@ const app = {
     } catch (error) {
       console.error("儲存失敗", error);
       alert("儲存至雲端失敗！如果您上傳了太多照片，可能超過了單筆文件大小上限。");
-      throw error; // 拋出錯誤讓原呼叫端捕捉
+      throw error; 
     }
   },
 
@@ -1189,7 +1184,6 @@ const app = {
     if (!date) return alert("請選擇服務日期！");
     if (!note && this.currentUploadedImages.length === 0) return alert("請填寫備註內容或上傳照片！");
 
-    // 暫存備份以防儲存失敗
     const backupData = JSON.stringify(this.data);
 
     if (id) {
@@ -1215,7 +1209,6 @@ const app = {
       this.closeModal();
       this.renderTimeline(this.activeCustomerId);
     } catch (e) {
-      // 若儲存失敗（例如超出容量），還原前端狀態
       this.data = JSON.parse(backupData);
     }
   },
@@ -1325,45 +1318,6 @@ const app = {
     }
   },
 
-  exportData() {
-    const dataStr = JSON.stringify(this.data, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `KiddsNoteBook_Backup_${this.getLocalDateStr()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  },
-
-  async importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const importedData = JSON.parse(e.target.result);
-        if (importedData.customers && importedData.records) {
-          if(confirm("即將覆蓋現有資料，確定要還原匯入嗎？")) {
-            this.data = importedData;
-            if (!this.data.recycleBin) this.data.recycleBin = { customers: [], records: [] };
-            await this.saveCloudData();
-            alert("資料還原成功！");
-            this.navigate('customer-records');
-          }
-        } else {
-          alert("檔案格式不正確，請匯入正確的備份檔！");
-        }
-      } catch (error) {
-        alert("讀取檔案失敗：" + error.message);
-      }
-      event.target.value = '';
-    };
-    reader.readAsText(file);
-  },
-
   escapeHTML(str) {
     if(!str) return '';
     return str.replace(/[&<>'"]/g, 
@@ -1372,12 +1326,32 @@ const app = {
   }
 };
 
-// 將模組內的變數綁定到全域 (為了讓 HTML 中的 onclick 能正常執行)
 window.app = app;
 window.corgiInteraction = corgiInteraction;
-
-// 系統啟動
 window.onload = () => app.init();
+
+// --- Service Worker 註冊與自動更新機制 ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(registration => {
+      registration.onupdatefound = () => {
+        const installingWorker = registration.installing;
+        if (installingWorker == null) return;
+        
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed') {
+            if (navigator.serviceWorker.controller) {
+              alert('系統已更新至最新版本，即將為您重新載入！');
+              window.location.reload();
+            }
+          }
+        };
+      };
+    }).catch(error => {
+      console.log('Service Worker 註冊失敗:', error);
+    });
+  });
+}
 </script>
 </body>
 </html>
