@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kidd's Note Book - Salon CRM</title>
+<style>
+  /* 色系變數 */
+  :root {
+    --bg-color: #E2E5E7;
+    --sidebar-color: #34495E;
+    --btn-color: #455A64;
+    --btn-hover: #263238;
+    --text-dark: #2C3539;
+    --text-light: #FFFFFF;
+    --accent-color: #546E7A;
+    --danger-color: #D32F2F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Helvetica Neue', Arial, 'PingFang TC', '微軟正黑體', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* 側邊欄與按鈕區 (桌機預設) */
+  .sidebar {
+    width: 280px;
+    background-color: var(--sidebar-color);
+    padding: 25px 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .mobile-btn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* 經典髮廊旋轉燈動畫 */
+  .barber-pole {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 1px 2px rgba(255,255,255,0.1);
+    background: repeating-linear-gradient(
+      -45deg,
+      #FF4B4B,
+      #FF4B4B 12px,
+      #FFFFFF 12px,
+      #FFFFFF 24px,
+      #4B7BFF 24px,
+      #4B7BFF 36px,
+      #FFFFFF 36px,
+      #FFFFFF 48px
+    );
+    background-size: 68px 68px;
+    animation: rotatePole 1.5s linear infinite;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  @keyframes rotatePole {
+    0% { background-position: 0 0; }
+    100% { background-position: 68px 0; }
+  }
+
+  .btn {
+    background-color: var(--btn-color);
+    color: var(--text-light);
+    border: none;
+    padding: 18px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    letter-spacing: 1px;
+  }
+
+  .btn:hover, .btn.active {
+    background-color: var(--btn-hover);
+    transform: translateX(5px);
+  }
+
+  .divider {
+    height: 1px;
+    background-color: rgba(255,255,255,0.2);
+    margin: 15px 0;
+  }
+
+  .sidebar-footer {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+    padding-top: 5px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  /* === 全新優化：稜角臉型、微笑吐舌的柯基犬 === */
+  .corgi-container {
+    margin-top: auto; 
+    position: relative;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 5px;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .corgi-wrapper {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition: all 0.5s ease;
+  }
+  .corgi-body {
+    position: absolute;
+    width: 55px; height: 30px;
+    background: #E58D2E;
+    border-radius: 12px 15px 15px 12px; /* 稜角身體 */
+    bottom: 5px; left: 10px;
+    transition: all 0.5s ease;
+  }
+  .corgi-body::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 12px;
+    background: #FFF;
+    border-radius: 0 0 15px 12px;
+  }
+  
+  /* 頭部：稜角臉型、合理置中朝向 */
+  .corgi-head {
+    position: absolute;
+    width: 38px; height: 34px;
+    background: #E58D2E;
+    border-radius: 8px 8px 12px 12px; /* 稜角分明的臉頰 */
+    top: 15px; left: 2px;
+    transition: all 0.5s ease;
+    z-index: 2;
+  }
+  /* 臉部白毛 */
+  .corgi-face-white {
+    position: absolute;
+    width: 14px; height: 100%;
+    background: #FFF;
+    left: 12px; top: 0;
+    border-radius: 4px 4px 10px 10px;
+  }
+  .corgi-eye {
+    position: absolute;
+    width: 5px; height: 5px;
+    background: #333;
+    border-radius: 50%;
+    top: 14px;
+    transition: all 0.3s ease;
+  }
+  .corgi-eye.left { left: 7px; }
+  .corgi-eye.right { right: 7px; }
+  
+  /* 吻部 (鼻子與嘴巴) */
+  .corgi-snout {
+    position: absolute;
+    width: 24px; height: 16px;
+    background: #FFF;
+    border-radius: 8px;
+    bottom: 0px; left: 7px;
+  }
+  .corgi-nose {
+    position: absolute;
+    width: 8px; height: 5px;
+    background: #333;
+    border-radius: 3px;
+    top: 0px; left: 8px;
+  }
+  /* 微笑曲線 */
+  .corgi-mouth {
+    position: absolute;
+    width: 14px; height: 6px;
+    border-bottom: 2px solid #333;
+    border-radius: 0 0 10px 10px;
+    top: 3px; left: 5px;
+  }
+  /* 吐舌頭與喘氣動畫 */
+  .corgi-tongue {
+    position: absolute;
+    width: 6px; height: 10px;
+    background: #FF6B6B;
+    border-radius: 0 0 5px 5px;
+    top: 8px; left: 9px;
+    animation: pant 0.4s infinite alternate;
+  }
+  @keyframes pant {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(2px); }
+  }
+
+  /* 雙耳尖尖與粉嫩內耳 */
+  .corgi-ear {
+    position: absolute;
+    width: 16px; height: 20px;
+    background: #E58D2E;
+    top: -12px;
+    z-index: -1;
+  }
+  .corgi-ear.left { left: -2px; border-radius: 2px 14px 0 0; transform: rotate(-15deg); }
+  .corgi-ear.right { right: -2px; border-radius: 14px 2px 0 0; transform: rotate(15deg); }
+  .corgi-ear::after {
+    content: ''; position: absolute;
+    width: 10px; height: 14px;
+    background: #F4C4B7;
+    bottom: 0;
+  }
+  .corgi-ear.left::after { left: 4px; border-radius: 2px 10px 0 0; }
+  .corgi-ear.right::after { right: 4px; border-radius: 10px 2px 0 0; }
+
+  .corgi-tail {
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #E58D2E;
+    border-radius: 50%;
+    top: 24px; right: 12px;
+  }
+  .corgi-leg {
+    position: absolute;
+    width: 8px; height: 14px;
+    background: #FFF;
+    border-radius: 4px;
+    bottom: -2px;
+    transition: all 0.5s ease;
+  }
+  .corgi-leg.front { left: 18px; }
+  .corgi-leg.back { right: 22px; }
+
+  /* 睡眠狀態自然趴姿 */
+  .corgi-wrapper.sleep .corgi-body { height: 20px; width: 60px; bottom: 0; left: 8px; }
+  .corgi-wrapper.sleep .corgi-head { top: 30px; left: -2px; transform: rotate(-25deg); }
+  .corgi-wrapper.sleep .corgi-eye { height: 2px; border-radius: 0; top: 16px; background: #666; }
+  .corgi-wrapper.sleep .corgi-tongue { display: none; }
+  .corgi-wrapper.sleep .corgi-leg { bottom: 0px; height: 8px; transform: rotate(-70deg); }
+  .corgi-wrapper.sleep .corgi-leg.back { transform: rotate(70deg); right: 18px; }
+  
+  .zzz {
+    position: absolute;
+    top: 0px; left: -20px;
+    font-family: 'Comic Sans MS', sans-serif;
+    font-size: 14px; font-weight: bold;
+    color: rgba(255,255,255,0.8);
+    opacity: 0; pointer-events: none;
+  }
+  .corgi-wrapper.sleep .zzz { animation: floatZzz 2.5s infinite linear; }
+  @keyframes floatZzz {
+    0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translate(-10px, -25px) scale(1.3); opacity: 0; }
+  }
+
+  /* 單擊：汪汪叫跳躍 */
+  .corgi-wrapper.bark { animation: barkAnim 0.4s ease; }
+  @keyframes barkAnim {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-10px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-10px); }
+  }
+  
+  /* 雙擊：左右來回奔跑 2 趟 (精準轉向控制) */
+  .corgi-wrapper.run { animation: corgiRun 3s linear; }
+  @keyframes corgiRun {
+    0% { transform: translateX(0) scaleX(-1); }
+    14% { transform: translateX(80px) scaleX(-1); }
+    16% { transform: translateX(80px) scaleX(1); }
+    46% { transform: translateX(-80px) scaleX(1); }
+    48% { transform: translateX(-80px) scaleX(-1); }
+    78% { transform: translateX(80px) scaleX(-1); }
+    80% { transform: translateX(80px) scaleX(1); }
+    98% { transform: translateX(0) scaleX(1); }
+    100% { transform: translateX(0) scaleX(1); }
+  }
+
+  .corgi-speech-bubble {
+    position: absolute;
+    top: -25px; 
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: white;
+    border-radius: 15px;
+    padding: 6px 12px;
+    font-size: 14px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom center;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .corgi-speech-bubble::after {
+    content: ''; position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+  }
+  .corgi-speech-bubble.show { transform: translateX(-50%) scale(1); }
+
+  /* 主內容區 */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .logo-container {
+    text-align: center;
+    padding: 30px 40px 15px 40px;
+    flex-shrink: 0;
+    background-color: var(--bg-color);
+  }
+
+  .view-scroll-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    padding: 0 40px 40px 40px;
+    overflow: hidden; 
+  }
+
+  .glow-logo {
+    font-family: 'Copperplate', 'Copperplate Gothic Light', fantasy;
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #555;
+    animation: slowGlow 4s infinite alternate ease-in-out;
+  }
+
+  @keyframes slowGlow {
+    0% { text-shadow: 0 0 5px rgba(255,255,255,0.2), 0 0 10px rgba(255,255,255,0.1); color: #666; }
+    100% { text-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.6); color: #fff; }
+  }
+
+  .subtitle {
+    font-family: 'Copperplate', '微軟正黑體', fantasy;
+    font-size: 1rem;
+    color: #777;
+    margin-top: 5px;
+    letter-spacing: 3px;
+  }
+
+  #view-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 900px;
+    max-height: 100%; 
+    display: flex;
+    flex-direction: column;
+  }
+
+  .view-header {
+    padding: 30px 30px 20px 30px;
+    background: white;
+    border-bottom: 2px solid #eee;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .view-body {
+    padding: 20px 30px 30px 30px;
+    flex: 1;
+    overflow-y: auto; 
+  }
+
+  .view-body::-webkit-scrollbar { width: 8px; }
+  .view-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+  .view-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+  .view-body::-webkit-scrollbar-thumb:hover { background: #999; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--sidebar-color); }
+  .form-control { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+  
+  .action-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: var(--accent-color);
+  }
+  .action-btn:hover { background-color: var(--sidebar-color); }
+  .danger-btn { background-color: var(--danger-color); }
+  .danger-btn:hover { background-color: #B71C1C; }
+
+  .gallery-toggle-btn {
+    background-color: #E1F5FE; color: #0277BD; border: 1px solid #81D4FA;
+    border-radius: 25px; padding: 8px 18px; font-size: 15px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .gallery-toggle-btn:hover { background-color: #B3E5FC; }
+
+  .search-bar { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #ddd; border-radius: 8px; margin: 0; }
+  .customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .customer-card { background: #f9f9f9; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .customer-card h3 { font-size: 24px; margin: 0 0 15px 0; color: var(--sidebar-color); word-break: break-word; }
+  .card-actions { display: flex; gap: 10px; justify-content: center; }
+  
+  .timeline-wrapper { border-left: 3px solid var(--accent-color); margin-left: 20px; padding-left: 25px; }
+  .timeline-wrapper.empty { border-left: none; margin-left: 0; padding-left: 0; }
+  .timeline-item { position: relative; background: #fdfdfd; border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .timeline-item::before { content: ''; position: absolute; left: -33px; top: 20px; width: 14px; height: 14px; background: var(--sidebar-color); border-radius: 50%; border: 3px solid white; }
+  .timeline-meta { font-size: 14px; color: #888; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .timeline-meta strong { font-weight: bold; font-size: 18px; color: var(--sidebar-color); }
+  .timeline-content { font-size: 18px; line-height: 1.6; white-space: pre-wrap; color: #1A252C; }
+  
+  .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd; }
+  .image-gallery img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #ccc; transition: transform 0.2s; }
+  .image-gallery img:hover { transform: scale(1.05); }
+
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; }
+  .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  #imageViewerModal { z-index: 200; cursor: pointer; }
+  #fullScreenImage { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8); cursor: default; }
+
+  .tabs { display: flex; gap: 10px; }
+  .tab-btn { flex: 1; padding: 10px; background: #eee; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; }
+  .tab-btn.active { background: var(--accent-color); color: white; }
+  .hidden { display: none !important; }
+
+  /* =========================================
+     手機板 RWD 與 UI 專屬優化 (寬度小於 768px 觸發)
+     ========================================= */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .main-content { order: 1; flex: 1; padding-bottom: 0; }
+    .sidebar { order: 2; width: 100%; padding: 10px 15px; z-index: 50; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); }
+    .logo-container { padding: 15px; }
+    .glow-logo { font-size: 2.2rem; }
+    .subtitle { font-size: 0.8rem; }
+    
+    .view-scroll-area { padding: 0 15px 15px 15px; }
+
+    .sidebar-content {
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      max-height: 800px; opacity: 1; overflow: hidden; margin-top: 10px;
+    }
+    .sidebar-content.collapsed { max-height: 0; opacity: 0; margin-top: 0; }
+
+    .barber-pole { width: 240px; margin: 0 auto; cursor: pointer; }
+    .barber-pole:active { transform: scale(0.98); }
+
+    .mobile-btn-grid { display: grid; gap: 8px; }
+    .grid-top { grid-template-columns: 1fr 1fr; margin-top: 10px; }
+    .grid-bottom { grid-template-columns: 1fr 1fr 1fr; }
+    
+    .btn { padding: 10px 5px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
+    .divider { margin: 10px 0; }
+    .customer-grid { grid-template-columns: 1fr; } 
+    .corgi-container { height: 70px; padding-bottom: 0; }
+    .corgi-wrapper { transform: scale(0.85); transform-origin: bottom center; }
+    
+    .view-header { flex-direction: column; align-items: stretch; gap: 10px; padding: 20px; }
+    .view-header h2 { font-size: 22px !important; }
+    .view-body { padding: 15px 20px; }
+    
+    .view-header button.action-btn { width: 100%; text-align: center; margin-top: 10px; }
+    .timeline-wrapper { margin-left: 5px; padding-left: 15px; }
+    .timeline-item::before { left: -23px; width: 10px; height: 10px; top: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="barber-pole" onclick="app.toggleMobileSidebar()" title="點擊收合/展開選單"></div>
+    
+    <div class="sidebar-content" id="sidebarContent">
+      <div class="mobile-btn-grid grid-top">
+        <button class="btn" onclick="app.navigate('add-customer')">＋ 新增客人</button>
+        <button class="btn" onclick="app.navigate('customer-records')">✂️ 客人與紀錄</button>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <div class="mobile-btn-grid grid-bottom">
+        <button class="btn" onclick="app.exportData()">💾 備份匯出</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()">📂 還原匯入</button>
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(event)">
+        <button class="btn" onclick="app.navigate('recycle-bin')">🗑️ 歷史回收</button>
+      </div>
+
+      <div class="corgi-container">
+        <div class="corgi-speech-bubble" id="corgiBubble"></div>
+        <div class="corgi-wrapper sleep" id="corgi" onclick="corgiInteraction.click()">
+          <div class="zzz">Zzz</div>
+          <div class="corgi-body"></div>
+          <div class="corgi-leg front"></div>
+          <div class="corgi-leg back"></div>
+          <div class="corgi-head">
+            <div class="corgi-ear left"></div>
+            <div class="corgi-ear right"></div>
+            <div class="corgi-face-white"></div>
+            <div class="corgi-eye left"></div>
+            <div class="corgi-eye right"></div>
+            <div class="corgi-snout">
+              <div class="corgi-nose"></div>
+              <div class="corgi-mouth"></div>
+              <div class="corgi-tongue"></div>
+            </div>
+          </div>
+          <div class="corgi-tail"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">Design by ★ W a y</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="logo-container">
+      <div class="glow-logo">Kidd's Note Book</div>
+      <div class="subtitle">Salon CRM System <span style="font-size: 0.75rem; color: #999; font-family: sans-serif; letter-spacing: 1px; font-weight: normal;">(v.1.0)</span></div>
+    </div>
+    
+    <div class="view-scroll-area">
+      <div id="view-container">
+        <div class="view-body" style="display:flex; justify-content:center; align-items:center;">
+          <h2 style="color:#999; margin:0;">請點擊左側選單開始使用</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="recordModal">
+    <div class="modal-content">
+      <h3 id="modalTitle">新增紀錄</h3>
+      <input type="hidden" id="recordId">
+      <div class="form-group">
+        <label>服務日期</label>
+        <input type="date" id="recordDate" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>備註內容</label>
+        <textarea id="recordNote" class="form-control" rows="4" placeholder="請輸入服務項目、使用產品或客製化備註..."></textarea>
+      </div>
+      <div class="form-group" style="border-top:1px dashed #ccc; padding-top:15px;">
+        <label>照片紀錄 (選填)</label>
+        <button type="button" class="action-btn" style="background:#78909C; margin-bottom:10px; font-size:14px;" onclick="document.getElementById('recordImages').click()">＋ 上傳多圖</button>
+        <input type="file" id="recordImages" class="hidden" accept="image/*" multiple onchange="app.handleImageSelect(event)">
+        <div id="imagePreviewContainer" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="action-btn" style="background:#ccc; color:#333;" onclick="app.closeModal()">取消</button>
+        <button class="action-btn" onclick="app.saveRecord()">儲存紀錄</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="imageViewerModal" class="modal-overlay" onclick="this.style.display='none'">
+    <img id="fullScreenImage" src="" onclick="event.stopPropagation()">
+  </div>
+
+<script>
+// === 柯基犬互動邏輯 ===
+const corgiInteraction = {
+  timer: null,
+  clickTimeout: null,
+  hearts: ['❤️', '🧡', '💛', '💚', '💙', '💜', '💖', '💗', '💓', '💕'],
+  
+  getRandomHearts() {
+    let result = '';
+    for(let i=0; i<3; i++) {
+      result += this.hearts[Math.floor(Math.random() * this.hearts.length)] + ' ';
+    }
+    return result.trim();
+  },
+
+  click() {
+    if (this.clickTimeout) {
+      clearTimeout(this.clickTimeout);
+      this.clickTimeout = null;
+      this.dblclick();
+    } else {
+      this.clickTimeout = setTimeout(() => {
+        this.executeClick();
+        this.clickTimeout = null;
+      }, 250); 
+    }
+  },
+
+  executeClick() {
+    const corgi = document.getElementById('corgi');
+    const bubble = document.getElementById('corgiBubble');
+    
+    corgi.classList.remove('sleep', 'run');
+    corgi.classList.remove('bark');
+    void corgi.offsetWidth; 
+    corgi.classList.add('bark'); 
+
+    bubble.innerText = this.getRandomHearts();
+    bubble.classList.add('show');
+
+    this.resetTimer();
+  },
+
+  dblclick() {
+    const corgi = document.getElementById('corgi');
+    const bubble = document.getElementById('corgiBubble');
+    
+    corgi.classList.remove('sleep', 'bark', 'run');
+    void corgi.offsetWidth; 
+    corgi.classList.add('run'); 
+    
+    bubble.innerText = this.getRandomHearts();
+    bubble.classList.add('show');
+
+    this.resetTimer();
+  },
+
+  resetTimer() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      const corgi = document.getElementById('corgi');
+      const bubble = document.getElementById('corgiBubble');
+      corgi.classList.remove('bark', 'run');
+      corgi.classList.add('sleep');
+      bubble.classList.remove('show');
+    }, 6000);
+  }
+};
+
+// === CRM 核心邏輯 ===
+const app = {
+  data: {
+    customers: [],
+    records: [],
+    recycleBin: { customers: [], records: [] }
+  },
+  currentView: '',
+  activeCustomerId: null,
+  currentUploadedImages: [],
+
+  init() {
+    this.loadData();
+    this.navigate('customer-records');
+  },
+
+  loadData() {
+    const saved = localStorage.getItem('kiddsNoteBookData');
+    if (saved) {
+      try {
+        this.data = JSON.parse(saved);
+        if (!this.data.recycleBin) this.data.recycleBin = { customers: [], records: [] };
+      } catch (e) {
+        console.error("讀取資料失敗", e);
+      }
+    }
+  },
+
+  saveData() {
+    localStorage.setItem('kiddsNoteBookData', JSON.stringify(this.data));
+  },
+
+  generateId() {
+    return 'id_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  },
+
+  getContainer() {
+    return document.getElementById('view-container');
+  },
+
+  getLocalDateStr() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  toggleMobileSidebar() {
+    if(window.innerWidth <= 768) {
+        const content = document.getElementById('sidebarContent');
+        if(content) content.classList.toggle('collapsed');
+    }
+  },
+
+  navigate(viewName, params = {}) {
+    this.currentView = viewName;
+    const container = this.getContainer();
+    container.innerHTML = '';
+    
+    switch (viewName) {
+      case 'add-customer': this.renderAddCustomer(container); break;
+      case 'customer-records': this.renderCustomerRecords(container); break;
+      case 'edit-customer': this.renderEditCustomer(container, params.id); break;
+      case 'view-records': this.renderViewRecords(container, params.id); break;
+      case 'recycle-bin': this.renderRecycleBin(container); break;
+    }
+  },
+
+  renderAddCustomer(container) {
+    container.innerHTML = `
+      <div class="view-header">
+        <h2 style="margin:0; color:var(--sidebar-color);">新增客人</h2>
+      </div>
+      <div class="view-body">
+        <div class="form-group">
+          <label>客人姓名</label>
+          <input type="text" id="newCustomerName" class="form-control" placeholder="請輸入姓名">
+        </div>
+        <button class="action-btn" onclick="app.saveNewCustomer()">儲存客人資料</button>
+      </div>
+    `;
+  },
+
+  saveNewCustomer() {
+    const name = document.getElementById('newCustomerName').value.trim();
+    if (!name) return alert("請輸入客人姓名！"); 
+    this.data.customers.push({ id: this.generateId(), name: name, created_at: new Date().toISOString() });
+    this.saveData();
+    this.navigate('customer-records');
+  },
+
+  renderCustomerRecords(container) {
+    container.innerHTML = `
+      <div class="view-header" style="padding-bottom: 25px;">
+        <input type="text" id="searchBar" class="search-bar" placeholder="🔍 輸入關鍵字搜尋姓名..." oninput="app.filterCustomers()">
+      </div>
+      <div class="view-body">
+        <div id="customerGrid" class="customer-grid"></div>
+      </div>
+    `;
+    this.filterCustomers();
+  },
+
+  filterCustomers() {
+    const keyword = document.getElementById('searchBar')?.value.toLowerCase() || '';
+    const grid = document.getElementById('customerGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const filtered = this.data.customers.filter(c => c.name.toLowerCase().includes(keyword));
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#999;">目前沒有資料。</p>`;
+      return;
+    }
+    filtered.reverse().forEach(c => {
+      grid.innerHTML += `
+        <div class="customer-card">
+          <h3>${this.escapeHTML(c.name)}</h3>
+          <div class="card-actions">
+            <button class="action-btn" onclick="app.navigate('view-records', {id: '${c.id}'})">查看紀錄</button>
+            <button class="action-btn" style="background:#78909C;" onclick="app.navigate('edit-customer', {id: '${c.id}'})">編輯資料</button>
+          </div>
+        </div>
+      `;
+    });
+  },
+
+  renderEditCustomer(container, id) {
+    const customer = this.data.customers.find(c => c.id === id);
+    if (!customer) return this.navigate('customer-records');
+    container.innerHTML = `
+      <div class="view-header">
+        <h2 style="margin:0; color:var(--sidebar-color);">編輯客人資料</h2>
+      </div>
+      <div class="view-body">
+        <div class="form-group">
+          <label>客人姓名</label>
+          <input type="text" id="editCustomerName" class="form-control" value="${this.escapeHTML(customer.name)}">
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+          <button class="action-btn" onclick="app.updateCustomer('${id}')">更新儲存</button>
+          <button class="action-btn danger-btn" onclick="app.deleteCustomer('${id}')">刪除客戶</button>
+        </div>
+      </div>
+    `;
+  },
+
+  updateCustomer(id) {
+    const name = document.getElementById('editCustomerName').value.trim();
+    if (!name) return alert("姓名不可為空！");
+    const idx = this.data.customers.findIndex(c => c.id === id);
+    if (idx > -1) {
+      this.data.customers[idx].name = name;
+      this.saveData();
+      this.navigate('customer-records');
+    }
+  },
+
+  deleteCustomer(id) {
+    if (!confirm("確定要將此客戶移至回收桶嗎？")) return;
+    const idx = this.data.customers.findIndex(c => c.id === id);
+    if (idx > -1) {
+      const customer = this.data.customers.splice(idx, 1)[0];
+      customer.deleted_at = new Date().toISOString();
+      this.data.recycleBin.customers.push(customer);
+      this.saveData();
+      this.navigate('customer-records');
+    }
+  },
+
+  renderViewRecords(container, customerId) {
+    const customer = this.data.customers.find(c => c.id === customerId);
+    if (!customer) return this.navigate('customer-records');
+    this.activeCustomerId = customerId;
+
+    container.innerHTML = `
+      <div class="view-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px;">
+        <div style="display:flex; flex-direction:column; gap:8px; flex:1; word-break:break-word;">
+          <h2 style="margin:0; font-size:28px; color:var(--sidebar-color); line-height:1.3;">${this.escapeHTML(customer.name)}</h2>
+          <span style="background-color: #F4E2B1; color: #8A6D3B; padding: 4px 12px; border-radius: 4px; font-size: 14px; font-weight: bold; width: fit-content; letter-spacing: 1px;">美髮紀錄卡</span>
+        </div>
+        <button class="action-btn" style="white-space:nowrap; flex-shrink:0; padding:12px 20px; margin-top:5px; height:fit-content;" onclick="app.openRecordModal()">＋ 新增紀錄</button>
+      </div>
+      <div class="view-body">
+        <div id="timelineContainer" class="timeline-wrapper"></div>
+      </div>
+    `;
+    this.renderTimeline(customerId);
+  },
+
+  renderTimeline(customerId) {
+    const tlContainer = document.getElementById('timelineContainer');
+    if (!tlContainer) return;
+
+    const records = this.data.records
+      .filter(r => r.customer_id === customerId)
+      .sort((a, b) => {
+        const dateA = new Date(a.service_date).getTime();
+        const dateB = new Date(b.service_date).getTime();
+        if (dateB !== dateA) return dateB - dateA;
+        return new Date(b.system_time).getTime() - new Date(a.system_time).getTime();
+      });
+
+    if (records.length === 0) {
+      tlContainer.className = "timeline-wrapper empty";
+      tlContainer.innerHTML = `<p style="color:#999; margin:0;">目前尚無紀錄，點擊右上方按鈕新增。</p>`;
+      return;
+    }
+
+    tlContainer.className = "timeline-wrapper";
+    tlContainer.innerHTML = records.map(r => {
+      const hasImages = r.images && r.images.length > 0;
+      const galleryBtnHTML = hasImages 
+        ? `<button id="galleryBtn_${r.id}" class="gallery-toggle-btn" style="margin-right:10px;" onclick="app.toggleImageGallery('${r.id}')">📷展開查看照片</button>`
+        : '';
+        
+      const galleryHTML = hasImages
+        ? `<div id="gallery_${r.id}" class="image-gallery hidden">
+             ${r.images.map((imgSrc, idx) => `<img src="${imgSrc}" onclick="app.viewFullImage('${r.id}', ${idx})">`).join('')}
+           </div>`
+        : '';
+
+      return `
+        <div class="timeline-item">
+          <div class="timeline-meta">
+            <strong>服務日期：${r.service_date}</strong>
+            <span>建立於：${new Date(r.system_time).toLocaleString('zh-TW')}</span>
+          </div>
+          <div class="timeline-content">${this.escapeHTML(r.note)}</div>
+          
+          ${galleryHTML}
+
+          <div style="margin-top:20px; text-align:right; display:flex; justify-content:flex-end; align-items:center;">
+            ${galleryBtnHTML}
+            <button class="action-btn" style="padding:6px 12px; font-size:14px; background:#78909C; margin-right:8px;" onclick="app.openRecordModal('${r.id}')">編輯</button>
+            <button class="action-btn danger-btn" style="padding:6px 12px; font-size:14px;" onclick="app.deleteRecord('${r.id}')">刪除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  toggleImageGallery(recordId) {
+    const gallery = document.getElementById(`gallery_${recordId}`);
+    const btn = document.getElementById(`galleryBtn_${recordId}`);
+    if (gallery.classList.contains('hidden')) {
+      gallery.classList.remove('hidden');
+      btn.innerText = "📷收回照片";
+      btn.style.backgroundColor = "#B3E5FC";
+    } else {
+      gallery.classList.add('hidden');
+      btn.innerText = "📷展開查看照片";
+      btn.style.backgroundColor = "#E1F5FE";
+    }
+  },
+
+  viewFullImage(recordId, imgIndex) {
+    const record = this.data.records.find(r => r.id === recordId);
+    if (record && record.images && record.images[imgIndex]) {
+      document.getElementById('fullScreenImage').src = record.images[imgIndex];
+      document.getElementById('imageViewerModal').style.display = 'flex';
+    }
+  },
+
+  openRecordModal(recordId = null) {
+    const modal = document.getElementById('recordModal');
+    const title = document.getElementById('modalTitle');
+    const idInput = document.getElementById('recordId');
+    const dateInput = document.getElementById('recordDate');
+    const noteInput = document.getElementById('recordNote');
+    
+    this.currentUploadedImages = [];
+    document.getElementById('recordImages').value = ''; 
+
+    if (recordId) {
+      const record = this.data.records.find(r => r.id === recordId);
+      title.innerText = "編輯紀錄";
+      idInput.value = record.id;
+      dateInput.value = record.service_date;
+      noteInput.value = record.note;
+      if(record.images) this.currentUploadedImages = [...record.images];
+    } else {
+      title.innerText = "新增紀錄";
+      idInput.value = "";
+      dateInput.value = this.getLocalDateStr();
+      noteInput.value = "";
+    }
+    
+    this.renderImagePreview();
+    modal.style.display = "flex";
+  },
+
+  closeModal() {
+    document.getElementById('recordModal').style.display = "none";
+  },
+
+  async handleImageSelect(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    for (let file of files) {
+      const compressedDataUrl = await this.compressImage(file);
+      this.currentUploadedImages.push(compressedDataUrl);
+    }
+    this.renderImagePreview();
+  },
+
+  compressImage(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > MAX_WIDTH) {
+            height = Math.round((height *= MAX_WIDTH / width));
+            width = MAX_WIDTH;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+
+  renderImagePreview() {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = this.currentUploadedImages.map((src, index) => `
+      <div style="position:relative; width:80px; height:80px;">
+        <img src="${src}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+        <button type="button" style="position:absolute; top:-6px; right:-6px; background:#D32F2F; color:white; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; font-weight:bold; line-height:1; box-shadow:0 2px 4px rgba(0,0,0,0.3);" onclick="app.removePreviewImage(${index})">✕</button>
+      </div>
+    `).join('');
+  },
+
+  removePreviewImage(index) {
+    this.currentUploadedImages.splice(index, 1);
+    this.renderImagePreview();
+  },
+
+  saveRecord() {
+    const id = document.getElementById('recordId').value;
+    const date = document.getElementById('recordDate').value;
+    const note = document.getElementById('recordNote').value.trim();
+    
+    if (!date) return alert("請選擇服務日期！");
+    if (!note && this.currentUploadedImages.length === 0) return alert("請填寫備註內容或上傳照片！");
+
+    if (id) {
+      const idx = this.data.records.findIndex(r => r.id === id);
+      if (idx > -1) {
+        this.data.records[idx].service_date = date;
+        this.data.records[idx].note = note;
+        this.data.records[idx].images = [...this.currentUploadedImages];
+      }
+    } else {
+      this.data.records.push({
+        id: this.generateId(),
+        customer_id: this.activeCustomerId,
+        service_date: date,
+        note: note,
+        images: [...this.currentUploadedImages],
+        system_time: new Date().toISOString()
+      });
+    }
+
+    try {
+      this.saveData();
+      this.closeModal();
+      this.renderTimeline(this.activeCustomerId);
+    } catch (e) {
+      if (e.name === 'QuotaExceededError') {
+        alert("儲存失敗！您的瀏覽器儲存空間已滿，請嘗試刪除舊照片或舊紀錄。");
+      } else {
+        alert("發生未知錯誤：" + e.message);
+      }
+    }
+  },
+
+  deleteRecord(id) {
+    if (!confirm("確定要將此紀錄移至回收桶嗎？")) return;
+    const idx = this.data.records.findIndex(r => r.id === id);
+    if (idx > -1) {
+      const record = this.data.records.splice(idx, 1)[0];
+      record.deleted_at = new Date().toISOString();
+      this.data.recycleBin.records.push(record);
+      this.saveData();
+      this.renderTimeline(this.activeCustomerId);
+    }
+  },
+
+  renderRecycleBin(container, tab = 'customers') {
+    container.innerHTML = `
+      <div class="view-header">
+        <h2 style="margin:0 0 20px 0; color:var(--sidebar-color);">歷史回收桶</h2>
+        <div class="tabs">
+          <button class="tab-btn ${tab === 'customers' ? 'active' : ''}" onclick="app.renderRecycleBin(app.getContainer(), 'customers')">刪除客戶</button>
+          <button class="tab-btn ${tab === 'records' ? 'active' : ''}" onclick="app.renderRecycleBin(app.getContainer(), 'records')">刪除紀錄</button>
+        </div>
+      </div>
+      <div class="view-body" id="recycleContent"></div>
+    `;
+    const content = document.getElementById('recycleContent');
+    
+    if (tab === 'customers') {
+      if (this.data.recycleBin.customers.length === 0) {
+        content.innerHTML = `<p style="color:#999; margin:0;">回收桶內沒有客戶資料。</p>`;
+      } else {
+        content.innerHTML = this.data.recycleBin.customers.map(c => `
+          <div style="padding:15px; border:1px solid #ddd; margin-bottom:15px; border-radius:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:15px;">
+            <div style="flex:1; word-break:break-word;">
+              <strong style="font-size:18px; color:var(--sidebar-color);">${this.escapeHTML(c.name)}</strong>
+              <div style="font-size:13px; color:#888; margin-top:6px;">(刪除時間: ${new Date(c.deleted_at).toLocaleString()})</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="action-btn" style="background:#4CAF50; padding:6px 12px; font-size:14px;" onclick="app.restoreCustomer('${c.id}')">還原</button>
+              <button class="action-btn danger-btn" style="padding:6px 12px; font-size:14px;" onclick="app.hardDeleteCustomer('${c.id}')">永久刪除</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    } else {
+      if (this.data.recycleBin.records.length === 0) {
+        content.innerHTML = `<p style="color:#999; margin:0;">回收桶內沒有紀錄資料。</p>`;
+      } else {
+        content.innerHTML = this.data.recycleBin.records.map(r => `
+          <div style="padding:15px; border:1px solid #ddd; margin-bottom:15px; border-radius:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:15px;">
+            <div style="flex:1; word-break:break-word;">
+               <strong>日期: ${r.service_date}</strong><br>
+               <div style="color:#666; font-size:14px; margin-top:6px;">${this.escapeHTML(r.note).substring(0, 50)}...</div>
+               ${r.images && r.images.length > 0 ? `<div style="color:#0277BD; font-size:12px; margin-top:4px;">(包含 ${r.images.length} 張照片)</div>` : ''}
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="action-btn" style="background:#4CAF50; padding:6px 12px; font-size:14px;" onclick="app.restoreRecord('${r.id}')">還原</button>
+              <button class="action-btn danger-btn" style="padding:6px 12px; font-size:14px;" onclick="app.hardDeleteRecord('${r.id}')">永久刪除</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  },
+
+  restoreCustomer(id) {
+    const idx = this.data.recycleBin.customers.findIndex(c => c.id === id);
+    if (idx > -1) {
+      const c = this.data.recycleBin.customers.splice(idx, 1)[0];
+      delete c.deleted_at;
+      this.data.customers.push(c);
+      this.saveData();
+      this.renderRecycleBin(this.getContainer(), 'customers');
+    }
+  },
+
+  restoreRecord(id) {
+    const idx = this.data.recycleBin.records.findIndex(r => r.id === id);
+    if (idx > -1) {
+      const r = this.data.recycleBin.records.splice(idx, 1)[0];
+      delete r.deleted_at;
+      this.data.records.push(r);
+      this.saveData();
+      this.renderRecycleBin(this.getContainer(), 'records');
+    }
+  },
+
+  hardDeleteCustomer(id) {
+    if (!confirm("確定要「永久刪除」此客戶嗎？此操作無法復原！")) return;
+    const idx = this.data.recycleBin.customers.findIndex(c => c.id === id);
+    if (idx > -1) {
+      this.data.recycleBin.customers.splice(idx, 1);
+      this.saveData();
+      this.renderRecycleBin(this.getContainer(), 'customers');
+    }
+  },
+
+  hardDeleteRecord(id) {
+    if (!confirm("確定要「永久刪除」此紀錄嗎？此操作無法復原！")) return;
+    const idx = this.data.recycleBin.records.findIndex(r => r.id === id);
+    if (idx > -1) {
+      this.data.recycleBin.records.splice(idx, 1);
+      this.saveData();
+      this.renderRecycleBin(this.getContainer(), 'records');
+    }
+  },
+
+  exportData() {
+    const dataStr = JSON.stringify(this.data, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `KiddsNoteBook_Backup_${this.getLocalDateStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
+
+  importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (importedData.customers && importedData.records) {
+          if(confirm("即將覆蓋現有資料，確定要還原匯入嗎？")) {
+            this.data = importedData;
+            if (!this.data.recycleBin) this.data.recycleBin = { customers: [], records: [] };
+            this.saveData();
+            alert("資料還原成功！");
+            this.navigate('customer-records');
+          }
+        } else {
+          alert("檔案格式不正確，請匯入正確的備份檔！");
+        }
+      } catch (error) {
+        alert("讀取檔案失敗：" + error.message);
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  },
+
+  escapeHTML(str) {
+    if(!str) return '';
+    return str.replace(/[&<>'"]/g, 
+      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+  }
+};
+
+window.onload = () => app.init();
+</script>
+</body>
+</html>
