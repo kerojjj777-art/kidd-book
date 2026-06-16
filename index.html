@@ -201,7 +201,7 @@
     margin-top: auto; 
     position: relative;
     width: 100%;
-    height: 90px;
+    height: 120px; /* 優化：增加高度以容納對話氣泡 */
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -378,7 +378,7 @@
 
   .corgi-speech-bubble {
     position: absolute;
-    top: -25px; 
+    bottom: 75px; /* 優化：改用 bottom 定位，確保在容器內不被遮擋 */
     left: 50%;
     transform: translateX(-50%) scale(0);
     background: white;
@@ -565,7 +565,9 @@
     .btn { padding: 10px 5px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
     .divider { margin: 10px 0; }
     .customer-grid { grid-template-columns: 1fr; } 
-    .corgi-container { height: 70px; padding-bottom: 0; overflow: hidden; }
+    
+    .corgi-container { height: 100px; padding-bottom: 0; overflow: hidden; } /* 優化：增加手機版高度 */
+    .corgi-speech-bubble { bottom: 65px; } /* 優化：手機版氣泡適配 */
     .corgi-wrapper { transform: scale(0.85); transform-origin: bottom center; }
     
     .view-header { flex-direction: column; align-items: stretch; gap: 10px; padding: 20px; }
