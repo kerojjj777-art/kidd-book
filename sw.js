@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kidds-crm-cache-v1'; // 每次更新程式碼，請更改這個版本號 (v2, v3...)
+const CACHE_NAME = 'kidds-crm-cache-v1.4.0'; // 每次更新程式碼，請更改這個版本號 (v2, v3...)
 const urlsToCache = [
   './index.html',
   './manifest.json'
